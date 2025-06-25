@@ -8,16 +8,16 @@ This is a Python data analysis project focused on fetching and analyzing DeFi pr
 
 ### Core Components
 
-- **fetch_season_data.py**: Standalone script that fetches season data from two Pinto subgraphs:
+- **fetch_season_data.py**: Standalone script that fetches season data from Pinto subgraphs:
   - Pinto subgraph: Fetches season snapshots with twaDeltaB, twaPrice, and l2sr metrics
-  - Pintostalk subgraph: Fetches field hourly snapshots with podRate data
-  - Merges data from both sources and exports to CSV, filtering out the first 3 seasons (0-3) as noise
+  - Pintostalk subgraph: Fetches field hourly snapshots with podRate data and silo hourly snapshots with crop_ratio (beanToMaxLpGpPerBdvRatio)
+  - Merges data from all sources and exports to CSV, filtering out the first 3 seasons (0-3) as noise
   - Implements pagination and retry logic for robust data fetching
 
-- **analysis.py**: Currently empty - intended for data analysis of the fetched CSV data
+- **get_max_twadeltab.py**: Tracks maximum negative twaDeltaB values since genesis and identifies when new maximums occur
 
 - **pinto_season_data.csv**: Generated output containing merged season data with columns:
-  - Season, twaDeltaB, twaPrice, l2sr, podRate
+  - Season, twaDeltaB, twaPrice, l2sr, podRate, crop_ratio
 
 ### Subgraph Endpoints
 

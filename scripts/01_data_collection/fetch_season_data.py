@@ -27,7 +27,7 @@ PINTO_QUERY = """
 }
 """
 
-PINTOSTALK_QUERY = """
+PINTOSTALK_FIELD_QUERY = """
 {
   fieldHourlySnapshots(
     first: %d, 
@@ -38,6 +38,20 @@ PINTOSTALK_QUERY = """
   ) {
     season
     podRate
+  }
+}
+"""
+
+PINTOSTALK_SILO_QUERY = """
+{
+  siloHourlySnapshots(
+    first: %d, 
+    skip: %d, 
+    orderBy: season, 
+    orderDirection: asc
+  ) {
+    season
+    beanToMaxLpGpPerBdvRatio
   }
 }
 """
@@ -110,24 +124,24 @@ def fetch_all_pinto_data() -> Dict[int, Dict]:
     print(f"Total seasons from Pinto: {len(all_seasons)}")
     return all_seasons
 
-def fetch_all_pintostalk_data() -> Dict[int, Dict]:
+def fetch_all_field_data() -> Dict[int, Dict]:
     """Fetch all field data from Pintostalk subgraph with pagination."""
-    print("Fetching data from Pintostalk subgraph...")
+    print("Fetching field data from Pintostalk subgraph...")
     all_field_data = {}
     skip = 0
     batch_size = 1000
     
     while True:
-        query = PINTOSTALK_QUERY % (batch_size, skip)
+        query = PINTOSTALK_FIELD_QUERY % (batch_size, skip)
         data = query_subgraph(PINTOSTALK_SUBGRAPH, query)
         
         if not data or "fieldHourlySnapshots" not in data:
-            print(f"No more data or error at skip={skip}")
+            print(f"No more field data or error at skip={skip}")
             break
             
         snapshots = data["fieldHourlySnapshots"]
         if not snapshots:
-            print(f"No snapshots returned at skip={skip}")
+            print(f"No field snapshots returned at skip={skip}")
             break
             
         print(f"Fetched {len(snapshots)} field snapshots from Pintostalk (skip={skip})")
@@ -152,12 +166,51 @@ def fetch_all_pintostalk_data() -> Dict[int, Dict]:
     print(f"Total field snapshots from Pintostalk: {len(all_field_data)}")
     return all_field_data
 
-def merge_and_export_data(pinto_data: Dict[int, Dict], pintostalk_data: Dict[int, Dict], output_file: str):
-    """Merge data from both subgraphs and export to CSV."""
+def fetch_all_silo_data() -> Dict[int, Dict]:
+    """Fetch all silo data from Pintostalk subgraph with pagination."""
+    print("Fetching silo data from Pintostalk subgraph...")
+    all_silo_data = {}
+    skip = 0
+    batch_size = 1000
+    
+    while True:
+        query = PINTOSTALK_SILO_QUERY % (batch_size, skip)
+        data = query_subgraph(PINTOSTALK_SUBGRAPH, query)
+        
+        if not data or "siloHourlySnapshots" not in data:
+            print(f"No more silo data or error at skip={skip}")
+            break
+            
+        snapshots = data["siloHourlySnapshots"]
+        if not snapshots:
+            print(f"No silo snapshots returned at skip={skip}")
+            break
+            
+        print(f"Fetched {len(snapshots)} silo snapshots from Pintostalk (skip={skip})")
+        
+        for snapshot in snapshots:
+            season_num = int(snapshot["season"])
+            crop_ratio = snapshot.get("beanToMaxLpGpPerBdvRatio")
+            
+            all_silo_data[season_num] = {
+                "crop_ratio": crop_ratio
+            }
+        
+        if len(snapshots) < batch_size:
+            break
+            
+        skip += batch_size
+        time.sleep(0.1)  # Rate limiting
+    
+    print(f"Total silo snapshots from Pintostalk: {len(all_silo_data)}")
+    return all_silo_data
+
+def merge_and_export_data(pinto_data: Dict[int, Dict], field_data: Dict[int, Dict], silo_data: Dict[int, Dict], output_file: str):
+    """Merge data from all subgraphs and export to CSV."""
     print("Merging data and exporting to CSV...")
     
     # Get all unique seasons
-    all_seasons = set(pinto_data.keys()) | set(pintostalk_data.keys())
+    all_seasons = set(pinto_data.keys()) | set(field_data.keys()) | set(silo_data.keys())
     
     # Sort seasons
     sorted_seasons = sorted(all_seasons)
@@ -166,21 +219,23 @@ def merge_and_export_data(pinto_data: Dict[int, Dict], pintostalk_data: Dict[int
     filtered_seasons = [season for season in sorted_seasons if season > 3]
     
     with open(output_file, 'w', newline='') as csvfile:
-        fieldnames = ['Season', 'twaDeltaB', 'twaPrice', 'l2sr', 'podRate']
+        fieldnames = ['Season', 'twaDeltaB', 'twaPrice', 'l2sr', 'podRate', 'crop_ratio']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         writer.writeheader()
         
         for season in filtered_seasons:
             pinto_season = pinto_data.get(season, {})
-            pintostalk_season = pintostalk_data.get(season, {})
+            field_season = field_data.get(season, {})
+            silo_season = silo_data.get(season, {})
             
             row = {
                 'Season': season,
                 'twaDeltaB': pinto_season.get('twaDeltaB', ''),
                 'twaPrice': pinto_season.get('twaPrice', ''),
                 'l2sr': pinto_season.get('l2sr', ''),
-                'podRate': pintostalk_season.get('podRate', '')
+                'podRate': field_season.get('podRate', ''),
+                'crop_ratio': silo_season.get('crop_ratio', '')
             }
             
             writer.writerow(row)
@@ -192,13 +247,14 @@ def main():
     """Main function to orchestrate the data fetching and export."""
     print("Starting Pinto season data collection...")
     
-    # Fetch data from both subgraphs
+    # Fetch data from all subgraphs
     pinto_data = fetch_all_pinto_data()
-    pintostalk_data = fetch_all_pintostalk_data()
+    field_data = fetch_all_field_data()
+    silo_data = fetch_all_silo_data()
     
     # Export to CSV
     output_file = "../../data/pinto_season_data.csv"
-    merge_and_export_data(pinto_data, pintostalk_data, output_file)
+    merge_and_export_data(pinto_data, field_data, silo_data, output_file)
     
     print("Data collection complete!")
 
