@@ -5,6 +5,8 @@ Advanced ramp rate visualizations including 3D surfaces, contour plots, and pric
 
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
@@ -67,7 +69,7 @@ def create_3d_surface_plots(df: pd.DataFrame):
     
     save_path = "../../visualizations/ramp_rate_visualizations/3d_surface_plot.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"3D surface plot saved as: {save_path}")
 
@@ -184,7 +186,7 @@ def create_contour_plots(df: pd.DataFrame):
     plt.tight_layout()
     save_path = "../../visualizations/ramp_rate_visualizations/contour_plots.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Contour plots saved as: {save_path}")
 
@@ -315,7 +317,7 @@ def create_price_regime_analysis(df: pd.DataFrame):
     plt.tight_layout()
     save_path = "../../visualizations/ramp_rate_visualizations/price_regime_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Price regime analysis saved as: {save_path}")
     

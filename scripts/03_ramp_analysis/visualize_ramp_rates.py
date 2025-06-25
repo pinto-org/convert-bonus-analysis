@@ -6,6 +6,8 @@ Creates multiple types of plots to analyze capacity ramping at different Δd val
 
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
@@ -88,7 +90,7 @@ def create_price_delta_heatmaps(df: pd.DataFrame):
     plt.tight_layout()
     save_path = "../../visualizations/ramp_rate_visualizations/price_delta_heatmaps.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Price-Δd heatmaps saved as: {save_path}")
 
@@ -169,7 +171,7 @@ def create_ramp_tradeoff_analysis(df: pd.DataFrame):
     plt.tight_layout()
     save_path = "../../visualizations/ramp_rate_visualizations/ramp_tradeoff_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Ramp trade-off analysis saved as: {save_path}")
 
@@ -235,7 +237,7 @@ def create_timeseries_analysis(df: pd.DataFrame):
     plt.tight_layout()
     save_path = "../../visualizations/ramp_rate_visualizations/ramp_timeseries_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Time series analysis saved as: {save_path}")
 
@@ -288,7 +290,7 @@ def create_small_multiples_grid(df: pd.DataFrame):
     
     save_path = "../../visualizations/ramp_rate_visualizations/ramp_small_multiples.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Small multiples grid saved as: {save_path}")
 

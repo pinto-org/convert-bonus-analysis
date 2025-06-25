@@ -4,6 +4,8 @@ Plotting script to visualize maxNegativeTwaDeltaB values across all seasons.
 """
 
 import csv
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
@@ -57,7 +59,7 @@ def plot_max_twa_delta_b(csv_file: str):
     # Save the plot
     output_file = '../../data/max_negative_twa_delta_b_plot.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close the figure to free memory
     
     print(f"Plot saved as: {output_file}")
     print(f"Total seasons plotted: {len(df)}")

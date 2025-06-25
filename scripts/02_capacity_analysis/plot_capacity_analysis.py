@@ -5,6 +5,8 @@ Creates multiple types of plots to analyze capacity at different S values.
 """
 
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -43,7 +45,7 @@ def plot_multiline_timeseries(df: pd.DataFrame, save_path: str = "../../visualiz
     plt.tight_layout()
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Multi-line time series saved as: {save_path}")
 
@@ -76,7 +78,7 @@ def plot_capacity_heatmap(df: pd.DataFrame, save_path: str = "../../visualizatio
     plt.tight_layout()
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Heatmap saved as: {save_path}")
 
@@ -107,7 +109,7 @@ def plot_capacity_boxplots(df: pd.DataFrame, save_path: str = "../../visualizati
     plt.tight_layout()
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Box plots saved as: {save_path}")
 
@@ -155,7 +157,7 @@ def plot_key_moments_analysis(df: pd.DataFrame, save_path: str = "../../visualiz
     
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()  # Close figure to free memory
     
     print(f"Key moments analysis saved as: {save_path}")
     print(f"Found {len(key_moments)} key moments")
