@@ -26,8 +26,8 @@ def load_ramp_data(csv_file: str) -> pd.DataFrame:
 def create_price_delta_heatmaps(df: pd.DataFrame):
     """Create Price-Δd heatmaps showing seasons-to-max and seasons-to-min."""
     
-    # Define Δd values and their corresponding column patterns
-    delta_d_values = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0]
+    # Define Δd values and their corresponding column patterns (matching actual data: 0.1% to 3.0% in 0.1% steps)
+    delta_d_values = [i/10 for i in range(1, 31)]  # 0.1, 0.2, 0.3, ..., 3.0
     
     # Create price bins for better visualization
     price_bins = np.linspace(df['twaPrice'].min(), df['twaPrice'].quantile(0.95), 20)  # Exclude extreme outliers
@@ -97,8 +97,8 @@ def create_price_delta_heatmaps(df: pd.DataFrame):
 def create_ramp_tradeoff_analysis(df: pd.DataFrame):
     """Create scatter plot showing ramp-up vs ramp-down trade-offs."""
     
-    # Select key delta_d values for analysis
-    key_deltas = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0]
+    # Select key delta_d values for analysis (from 0.1% to 3.0% range)
+    key_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8))
     
@@ -178,8 +178,8 @@ def create_ramp_tradeoff_analysis(df: pd.DataFrame):
 def create_timeseries_analysis(df: pd.DataFrame):
     """Create time series analysis for key Δd values."""
     
-    # Select key delta_d values for visualization
-    key_deltas = [0.5, 1.0, 1.5, 2.0, 3.0, 5.0]
+    # Select key delta_d values for visualization (from 0.1% to 3.0% range)
+    key_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
     colors = plt.cm.Set2(np.linspace(0, 1, len(key_deltas)))
     
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12))
@@ -206,7 +206,7 @@ def create_timeseries_analysis(df: pd.DataFrame):
     ax2_twin = ax2.twinx()
     
     # Plot a subset of delta_d values to avoid clutter
-    subset_deltas = [1.0, 2.0, 5.0]
+    subset_deltas = [1.0, 2.0, 3.0]
     subset_colors = [colors[key_deltas.index(d)] for d in subset_deltas]
     
     for i, delta_d in enumerate(subset_deltas):
@@ -244,8 +244,8 @@ def create_timeseries_analysis(df: pd.DataFrame):
 def create_small_multiples_grid(df: pd.DataFrame):
     """Create small multiples grid comparing different Δd behaviors."""
     
-    # Select 6 key delta_d values for the grid
-    key_deltas = [0.5, 1.0, 1.5, 2.0, 3.0, 5.0]
+    # Select 6 key delta_d values for the grid (from 0.1% to 3.0% range)
+    key_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
     
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     axes = axes.flatten()

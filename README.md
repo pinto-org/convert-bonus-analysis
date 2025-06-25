@@ -150,10 +150,10 @@ Based on ramp rate analysis across price regimes:
 - **Medium Price (0.775-0.997)**: Δd ≈ 1.01-1.20% for 100-season ramp  
 - **High Price (0.998+)**: Δd ≈ 0.99% for 100-season ramp
 
-#### **By Desired Ramp Speed**
-- **Fast Ramping (50-100 seasons)**: Δd = 1.15-2.30%
+#### **By Desired Ramp Speed** (Updated for 0.1%-3.0% range)
+- **Fast Ramping (50-100 seasons)**: Δd = 1.15-3.0%
 - **Moderate Ramping (100-200 seasons)**: Δd = 0.58-1.15%
-- **Slow Ramping (200-500 seasons)**: Δd = 0.23-0.58%
+- **Slow Ramping (200-500 seasons)**: Δd = 0.1-0.58%
 
 ## 📈 Files Generated
 

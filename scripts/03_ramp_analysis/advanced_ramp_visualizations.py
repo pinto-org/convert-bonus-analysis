@@ -30,8 +30,8 @@ def load_ramp_data(csv_file: str) -> pd.DataFrame:
 def create_3d_surface_plots(df: pd.DataFrame):
     """Create 3D surface plots showing Price × Δd × Seasons-to-Max relationship."""
     
-    # Define delta_d values and price range
-    key_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+    # Define delta_d values and price range (0.1% to 3.0%)
+    key_deltas = [i/10 for i in range(5, 31, 3)]  # 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6, 2.9
     price_range = np.linspace(df['twaPrice'].quantile(0.05), df['twaPrice'].quantile(0.95), 20)
     
     # Create meshgrid
@@ -76,8 +76,8 @@ def create_3d_surface_plots(df: pd.DataFrame):
 def create_interactive_3d_surface(df: pd.DataFrame):
     """Create interactive 3D surface plot with Plotly."""
     
-    # Define ranges
-    key_deltas = np.arange(0.5, 5.1, 0.25)  # More granular for smoother surface
+    # Define ranges (0.1% to 3.0% in 0.1% steps for smoother surface)
+    key_deltas = np.arange(0.1, 3.1, 0.1)
     price_range = np.linspace(df['twaPrice'].quantile(0.05), df['twaPrice'].quantile(0.95), 30)
     
     # Create meshgrid
@@ -117,8 +117,8 @@ def create_interactive_3d_surface(df: pd.DataFrame):
 def create_contour_plots(df: pd.DataFrame):
     """Create contour plots showing ramp time levels."""
     
-    # Define ranges
-    key_deltas = np.arange(0.1, 5.1, 0.1)
+    # Define ranges (0.1% to 3.0% in 0.1% steps)
+    key_deltas = np.arange(0.1, 3.1, 0.1)
     price_range = np.linspace(df['twaPrice'].quantile(0.05), df['twaPrice'].quantile(0.95), 50)
     
     # Create meshgrid
@@ -212,7 +212,7 @@ def create_price_regime_analysis(df: pd.DataFrame):
     fig, axes = plt.subplots(2, 2, figsize=(18, 12))
     
     # 1. Box plots of ramp times by regime (Top Left)
-    key_deltas = [1.0, 2.0, 3.0, 5.0]
+    key_deltas = [0.5, 1.0, 2.0, 3.0]
     regime_colors = ['lightcoral', 'lightsalmon', 'lightblue', 'lightgreen']
     
     box_data = []

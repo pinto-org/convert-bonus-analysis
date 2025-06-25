@@ -34,8 +34,14 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
                [{"secondary_y": True}, {"secondary_y": False}]]
     )
     
-    # Define key delta_d values for analysis
-    key_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]
+    # Define complete range of delta_d values for analysis (0.1% to 3.0% in 0.1% steps)
+    all_deltas = [i/10 for i in range(1, 31)]  # 0.1, 0.2, 0.3, ..., 3.0
+    
+    # For heatmap: use full range for comprehensive analysis
+    heatmap_deltas = all_deltas
+    
+    # For trade-offs: use every 3rd value for clarity (10 points)
+    tradeoff_deltas = [all_deltas[i] for i in range(2, len(all_deltas), 3)]  # 0.3, 0.6, 0.9, etc.
     colors = px.colors.qualitative.Set3
     
     # 1. Price-Δd Heatmap (Top Left)
@@ -44,9 +50,9 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     price_centers = (price_bins[:-1] + price_bins[1:]) / 2
     
     # Initialize heatmap matrix
-    heatmap_matrix = np.zeros((len(key_deltas), len(price_centers)))
+    heatmap_matrix = np.zeros((len(heatmap_deltas), len(price_centers)))
     
-    for i, delta_d in enumerate(key_deltas):
+    for i, delta_d in enumerate(heatmap_deltas):
         delta_d_pct = f"{delta_d:.2f}".replace('.', '_')
         max_col = f"seasons_to_max_capacity_dd_{delta_d_pct}pct"
         
@@ -62,7 +68,7 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
         go.Heatmap(
             z=heatmap_matrix,
             x=[f'{p:.2f}' for p in price_centers],
-            y=[f'{d}%' for d in key_deltas],
+            y=[f'{d}%' for d in heatmap_deltas],
             colorscale='RdYlBu_r',
             name='Seasons to Max',
             hovertemplate='Price: %{x}<br>Δd: %{y}<br>Seasons to Max: %{z:.1f}<extra></extra>'
@@ -77,22 +83,22 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     increase_rates = []
     decrease_rates = []
     
-    for delta_d in key_deltas:
+    for delta_d in tradeoff_deltas:
         delta_d_pct = f"{delta_d:.2f}".replace('.', '_')
         inc_col = f"effective_increase_rate_dd_{delta_d_pct}pct"
         dec_col = f"effective_decrease_rate_dd_{delta_d_pct}pct"
         
         increase_rates.append(median_data[inc_col] * 100)
-        decrease_rates.append(median_data[dec_col] * 100)
+        decrease_rates.append(median_data[dec_col] * 100)  # Multiply by 100 to convert to percentage
     
     fig.add_trace(
         go.Scatter(
             x=increase_rates,
             y=decrease_rates,
             mode='markers+text',
-            text=[f'{d}%' for d in key_deltas],
+            text=[f'{d}%' for d in tradeoff_deltas],
             textposition='top center',
-            marker=dict(size=12, color=key_deltas, colorscale='Viridis', showscale=False),
+            marker=dict(size=12, color=tradeoff_deltas, colorscale='Viridis', showscale=False),
             name='Trade-offs',
             hovertemplate='Δd: %{text}<br>Increase Rate: %{x:.3f}%/season<br>Decrease Rate: %{y:.3f}%/season<extra></extra>'
         ),
@@ -100,10 +106,10 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     )
     
     # 3. Time Series Analysis (Bottom Left)
-    # Plot a few key delta_d values
-    subset_deltas = [1.0, 2.0, 4.0]
+    # Plot a few key delta_d values for time series (keep small for readability)
+    timeseries_deltas = [0.3, 0.8, 1.5, 2.2, 3.0]
     
-    for i, delta_d in enumerate(subset_deltas):
+    for i, delta_d in enumerate(timeseries_deltas):
         delta_d_pct = f"{delta_d:.2f}".replace('.', '_')
         max_col = f"seasons_to_max_capacity_dd_{delta_d_pct}pct"
         
@@ -140,7 +146,7 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     
     # 4. Target-Based Analysis (Bottom Right)
     # Show required Δd for different target ramp times
-    target_seasons = [50, 100, 150, 200, 300, 500]
+    target_seasons = [50, 100, 150, 200, 300, 500, 750, 1000]
     median_price = df['twaPrice'].median()
     
     required_deltas = []
@@ -177,7 +183,7 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     fig.update_yaxes(title_text="Δd (%)", row=1, col=1)
     
     fig.update_xaxes(title_text="Increase Rate (%/season)", row=1, col=2)
-    fig.update_yaxes(title_text="Decrease Rate (%/season)", type="log", row=1, col=2)
+    fig.update_yaxes(title_text="Decrease Rate (%/season)", row=1, col=2)
     
     fig.update_xaxes(title_text="Season", row=2, col=1)
     fig.update_yaxes(title_text="Seasons to Max (capped at 1000)", type="log", row=2, col=1)
@@ -195,8 +201,8 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
 def create_delta_explorer(df: pd.DataFrame, output_file: str = "../../visualizations/ramp_rate_visualizations/delta_explorer.html"):
     """Create focused interactive tool to explore different Δd values."""
     
-    # Define all available delta_d values
-    all_deltas = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0]
+    # Define all available delta_d values (0.1% to 3.0% in 0.1% steps)
+    all_deltas = [i/10 for i in range(1, 31)]  # 0.1, 0.2, 0.3, ..., 3.0
     
     # Create initial plot with first delta value
     initial_delta = 1.0
@@ -285,8 +291,8 @@ def create_target_based_analysis(df: pd.DataFrame):
     )
     
     # 1. Required Δd by Price Level (Top Left)
-    target_seasons = [50, 100, 200, 500]
-    colors_targets = ['red', 'orange', 'blue', 'green']
+    target_seasons = [50, 100, 200, 500, 1000]
+    colors_targets = ['red', 'orange', 'blue', 'green', 'purple']
     
     for i, target in enumerate(target_seasons):
         required_deltas = []
@@ -309,9 +315,10 @@ def create_target_based_analysis(df: pd.DataFrame):
     # 2. Ramp Time Distribution (Top Right)
     # Show distribution of ramp times for key Δd values at median price
     median_price = df['twaPrice'].median()
-    key_deltas = [0.5, 1.0, 2.0, 5.0]
+    # Use broader range for distribution analysis
+    distribution_deltas = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
     
-    for delta_d in key_deltas:
+    for delta_d in distribution_deltas:
         delta_d_pct = f"{delta_d:.2f}".replace('.', '_')
         max_col = f"seasons_to_max_capacity_dd_{delta_d_pct}pct"
         

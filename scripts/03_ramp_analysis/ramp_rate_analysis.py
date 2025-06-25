@@ -5,8 +5,6 @@ Calculates effective D_t and seasons to max/min capacity for different delta_d p
 """
 
 import pandas as pd
-import numpy as np
-import csv
 import os
 
 def calculate_ramp_rates(df: pd.DataFrame) -> pd.DataFrame:
@@ -21,9 +19,8 @@ def calculate_ramp_rates(df: pd.DataFrame) -> pd.DataFrame:
     For this analysis, we'll focus on the increase/decrease rates.
     """
     
-    # Define delta_d values: 0.1% to 5% with 0.25% steps after 0.1%
-    delta_d_values = [0.001]  # 0.1%
-    delta_d_values.extend([i/100 for i in np.arange(0.25, 5.25, 0.25)])  # 0.25% to 5%
+    # Define delta_d values: 0.1% to 3% with 0.1% steps
+    delta_d_values = [i/1000 for i in range(1, 31)]  # 0.1% to 3.0% in 0.1% steps
     
     print(f"Analyzing {len(delta_d_values)} delta_d values: {[f'{d*100:.2f}%' for d in delta_d_values]}")
     
@@ -88,7 +85,7 @@ def analyze_historical_ramp_patterns(df: pd.DataFrame):
     
     print(f"\n=== Ramp Rate Analysis at Key Price Levels ===")
     
-    delta_d_values = [0.001, 0.0025, 0.005, 0.0075, 0.01, 0.02, 0.03, 0.04, 0.05]
+    delta_d_values = [i/1000 for i in range(1, 31, 2)]  # Sample subset for display: 0.1%, 0.3%, 0.5%, ..., 2.9%
     
     for i, price in enumerate(key_prices):
         price_label = ['Min', '25th %ile', 'Median', '75th %ile', 'Max'][i]

@@ -42,19 +42,6 @@ PINTOSTALK_FIELD_QUERY = """
 }
 """
 
-PINTOSTALK_SILO_QUERY = """
-{
-  siloHourlySnapshots(
-    first: %d, 
-    skip: %d, 
-    orderBy: season, 
-    orderDirection: asc
-  ) {
-    season
-    beanToMaxLpGpPerBdvRatio
-  }
-}
-"""
 
 def query_subgraph(endpoint: str, query: str, retries: int = 3) -> Optional[Dict]:
     """Query a subgraph with retry logic."""
@@ -166,61 +153,13 @@ def fetch_all_field_data() -> Dict[int, Dict]:
     print(f"Total field snapshots from Pintostalk: {len(all_field_data)}")
     return all_field_data
 
-def fetch_all_silo_data() -> Dict[int, Dict]:
-    """Fetch all silo data from Pintostalk subgraph with pagination."""
-    print("Fetching silo data from Pintostalk subgraph...")
-    all_silo_data = {}
-    skip = 0
-    batch_size = 1000
-    
-    while True:
-        query = PINTOSTALK_SILO_QUERY % (batch_size, skip)
-        data = query_subgraph(PINTOSTALK_SUBGRAPH, query)
-        
-        if not data or "siloHourlySnapshots" not in data:
-            print(f"No more silo data or error at skip={skip}")
-            break
-            
-        snapshots = data["siloHourlySnapshots"]
-        if not snapshots:
-            print(f"No silo snapshots returned at skip={skip}")
-            break
-            
-        print(f"Fetched {len(snapshots)} silo snapshots from Pintostalk (skip={skip})")
-        
-        for snapshot in snapshots:
-            season_num = int(snapshot["season"])
-            bean_to_max_lp_gp_per_bdv_ratio = snapshot.get("beanToMaxLpGpPerBdvRatio")
-            
-            # Calculate crop ratio percentage using the formula
-            # Assumes no rain (is_raining = False), so lower_bound = 0.5
-            if bean_to_max_lp_gp_per_bdv_ratio is not None:
-                bean_to_max_lp_gp_per_bdv_ratio = float(bean_to_max_lp_gp_per_bdv_ratio)
-                upper_bound = 2.0
-                lower_bound = 0.5  # No rain
-                crop_ratio_pct = (lower_bound + (upper_bound - lower_bound) * (bean_to_max_lp_gp_per_bdv_ratio / 100e18)) * 100
-            else:
-                crop_ratio_pct = None
-            
-            all_silo_data[season_num] = {
-                "crop_ratio": crop_ratio_pct
-            }
-        
-        if len(snapshots) < batch_size:
-            break
-            
-        skip += batch_size
-        time.sleep(0.1)  # Rate limiting
-    
-    print(f"Total silo snapshots from Pintostalk: {len(all_silo_data)}")
-    return all_silo_data
 
-def merge_and_export_data(pinto_data: Dict[int, Dict], field_data: Dict[int, Dict], silo_data: Dict[int, Dict], output_file: str):
+def merge_and_export_data(pinto_data: Dict[int, Dict], field_data: Dict[int, Dict], output_file: str):
     """Merge data from all subgraphs and export to CSV."""
     print("Merging data and exporting to CSV...")
     
     # Get all unique seasons
-    all_seasons = set(pinto_data.keys()) | set(field_data.keys()) | set(silo_data.keys())
+    all_seasons = set(pinto_data.keys()) | set(field_data.keys())
     
     # Sort seasons
     sorted_seasons = sorted(all_seasons)
@@ -229,7 +168,7 @@ def merge_and_export_data(pinto_data: Dict[int, Dict], field_data: Dict[int, Dic
     filtered_seasons = [season for season in sorted_seasons if season > 3]
     
     with open(output_file, 'w', newline='') as csvfile:
-        fieldnames = ['Season', 'twaDeltaB', 'twaPrice', 'l2sr', 'podRate', 'crop_ratio']
+        fieldnames = ['Season', 'twaDeltaB', 'twaPrice', 'l2sr', 'podRate']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         writer.writeheader()
@@ -237,15 +176,13 @@ def merge_and_export_data(pinto_data: Dict[int, Dict], field_data: Dict[int, Dic
         for season in filtered_seasons:
             pinto_season = pinto_data.get(season, {})
             field_season = field_data.get(season, {})
-            silo_season = silo_data.get(season, {})
             
             row = {
                 'Season': season,
                 'twaDeltaB': pinto_season.get('twaDeltaB', ''),
                 'twaPrice': pinto_season.get('twaPrice', ''),
                 'l2sr': pinto_season.get('l2sr', ''),
-                'podRate': field_season.get('podRate', ''),
-                'crop_ratio': silo_season.get('crop_ratio', '')
+                'podRate': field_season.get('podRate', '')
             }
             
             writer.writerow(row)
@@ -260,11 +197,10 @@ def main():
     # Fetch data from all subgraphs
     pinto_data = fetch_all_pinto_data()
     field_data = fetch_all_field_data()
-    silo_data = fetch_all_silo_data()
     
     # Export to CSV
     output_file = "../../data/pinto_season_data.csv"
-    merge_and_export_data(pinto_data, field_data, silo_data, output_file)
+    merge_and_export_data(pinto_data, field_data, output_file)
     
     print("Data collection complete!")
 

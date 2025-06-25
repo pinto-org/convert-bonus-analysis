@@ -5,8 +5,7 @@ Adds columns for maxNegativeTwaDeltaB and isNewMax to the CSV file.
 
 Key Logic:
 - Tracks maximum negative twaDeltaB since genesis
-- Resets maxNegativeTwaDeltaB to 0 when crop_ratio < 100% AND twaDeltaB > 0
-- Calculates crop_ratio as percentage: 50% + (150% * beanToMaxLpGpPerBdvRatio / 100e18)
+- Resets maxNegativeTwaDeltaB to 0 when twaDeltaB > 0
 """
 
 import csv
@@ -28,11 +27,10 @@ def process_season_data(input_file: str, output_file: str):
     # Process each row and add new columns
     for row in rows:
         twa_delta_b = float(row['twaDeltaB']) if row['twaDeltaB'] else 0.0
-        crop_ratio = float(row['crop_ratio']) if row['crop_ratio'] else 0.0
         is_new_max = False
         
-        # Reset logic: maxTwaDeltaB resets when crop_ratio < 100% and twaDeltaB > 0
-        if crop_ratio < 100.0 and twa_delta_b > 0:
+        # Reset logic: maxTwaDeltaB resets when twaDeltaB > 0
+        if twa_delta_b > 0:
             max_negative_twa_delta_b = 0.0  # Reset to 0
         
         # Apply the logic from requirements:
