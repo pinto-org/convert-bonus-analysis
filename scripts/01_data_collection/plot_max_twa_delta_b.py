@@ -55,7 +55,7 @@ def plot_max_twa_delta_b(csv_file: str):
     plt.tight_layout()
     
     # Save the plot
-    output_file = 'max_negative_twa_delta_b_plot.png'
+    output_file = '../../data/max_negative_twa_delta_b_plot.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -74,7 +74,7 @@ def plot_max_twa_delta_b(csv_file: str):
 
 def main():
     """Main function to create the plot."""
-    csv_file = "pinto_season_data_with_max_negative.csv"
+    csv_file = "../../data/pinto_season_data_with_max_negative.csv"
     plot_max_twa_delta_b(csv_file)
 
 if __name__ == "__main__":

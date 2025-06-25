@@ -27,45 +27,59 @@ We analyze **5,213+ seasons** of historical data to understand price dynamics an
 
 ## 🚀 Analysis Flow
 
-### **Step 1: Data Collection**
+### **Option 1: Run Everything (Recommended)**
 ```bash
+python3 run_analysis.py
+```
+Runs the complete analysis pipeline automatically with progress tracking and error handling.
+
+### **Option 2: Run Individual Steps**
+
+#### **Step 1: Data Collection**
+```bash
+cd scripts/01_data_collection
 python3 fetch_season_data.py
+python3 get_max_twadeltab.py
+python3 plot_max_twa_delta_b.py
 ```
-Fetches season data from two Pinto subgraphs and merges into `pinto_season_data.csv`
 
-### **Step 2: Maximum Negative TwaDeltaB Tracking**  
+#### **Step 2: Capacity Analysis** 
 ```bash
-python3 get_max_negative_twadeltab.py
-```
-Tracks the maximum negative twaDeltaB values since genesis, identifies when new maximums occur
-
-### **Step 3: Capacity Analysis**
-```bash
+cd scripts/02_capacity_analysis
 python3 add_capacity_analysis.py
-```
-Calculates capacity for different S values (100-1000) showing how scaling affects capacity
-
-### **Step 4: Ramp Rate Analysis**
-```bash
-python3 ramp_rate_analysis.py
-```
-Analyzes ramping behavior for different Δd values (0.1%-5%) and provides optimization recommendations
-
-### **Step 5-7: Visualization Generation**
-```bash
-# Capacity visualizations
 python3 plot_capacity_analysis.py
 python3 interactive_capacity_dashboard.py
+```
 
-# Ramp rate visualizations  
+#### **Step 3: Ramp Rate Analysis**
+```bash
+cd scripts/03_ramp_analysis
+python3 ramp_rate_analysis.py
 python3 visualize_ramp_rates.py
 python3 interactive_ramp_dashboard.py
 python3 advanced_ramp_visualizations.py
 ```
 
-## 📁 Visualization Folders
+## 📁 Project Structure
 
-### **`capacity_visualizations/` - S Parameter Analysis**
+```
+convert-bonus-analysis/
+├── run_analysis.py              # Master script (run this!)
+├── README.md                    # This file
+├── CLAUDE.md                    # Claude Code instructions
+├── scripts/                     # All analysis scripts
+│   ├── 01_data_collection/      # Data fetching and processing
+│   ├── 02_capacity_analysis/    # S parameter analysis
+│   └── 03_ramp_analysis/        # Δd parameter analysis
+├── data/                        # Generated CSV files and plots
+└── visualizations/              # All generated visualizations
+    ├── capacity_visualizations/ # S parameter visualizations
+    └── ramp_rate_visualizations/# Δd parameter visualizations
+```
+
+## 📊 Visualization Analysis
+
+### **`visualizations/capacity_visualizations/` - S Parameter Analysis**
 
 Understanding how different S values affect capacity scaling:
 
@@ -86,7 +100,7 @@ Understanding how different S values affect capacity scaling:
 - **`capacity_dashboard.html`**: 4-panel interactive dashboard for exploring capacity relationships
 - **`interactive_timeseries.html`**: Toggle different S values on/off to compare behaviors
 
-### **`ramp_rate_visualizations/` - Δd Parameter Analysis**
+### **`visualizations/ramp_rate_visualizations/` - Δd Parameter Analysis**
 
 Understanding optimal ramping rates for capacity adjustments:
 

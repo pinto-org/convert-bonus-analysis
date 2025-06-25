@@ -151,8 +151,8 @@ def save_ramp_analysis(df: pd.DataFrame, output_file: str):
 
 def main():
     """Main function for ramp rate analysis."""
-    input_file = "pinto_season_data_with_capacity_analysis.csv"
-    output_file = "pinto_season_data_with_ramp_analysis.csv"
+    input_file = "../../data/pinto_season_data_with_capacity_analysis.csv"
+    output_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
     
     if not os.path.exists(input_file):
         print(f"Error: {input_file} not found. Please run add_capacity_analysis.py first.")

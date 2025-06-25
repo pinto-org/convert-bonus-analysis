@@ -197,7 +197,7 @@ def main():
     pintostalk_data = fetch_all_pintostalk_data()
     
     # Export to CSV
-    output_file = "pinto_season_data.csv"
+    output_file = "../../data/pinto_season_data.csv"
     merge_and_export_data(pinto_data, pintostalk_data, output_file)
     
     print("Data collection complete!")

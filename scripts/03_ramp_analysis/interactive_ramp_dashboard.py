@@ -22,7 +22,7 @@ def load_ramp_data(csv_file: str) -> pd.DataFrame:
     print(f"Loaded {len(df)} seasons of ramp rate data")
     return df
 
-def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "ramp_rate_visualizations/ramp_interactive_dashboard.html"):
+def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../../visualizations/ramp_rate_visualizations/ramp_interactive_dashboard.html"):
     """Create comprehensive interactive dashboard for ramp rate analysis."""
     
     # Create subplot structure
@@ -192,7 +192,7 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "ramp
     
     return fig
 
-def create_delta_explorer(df: pd.DataFrame, output_file: str = "ramp_rate_visualizations/delta_explorer.html"):
+def create_delta_explorer(df: pd.DataFrame, output_file: str = "../../visualizations/ramp_rate_visualizations/delta_explorer.html"):
     """Create focused interactive tool to explore different Δd values."""
     
     # Define all available delta_d values
@@ -397,7 +397,7 @@ def create_target_based_analysis(df: pd.DataFrame):
     fig.update_xaxes(title_text="Target Scenarios", row=2, col=2)
     fig.update_yaxes(title_text="Required Δd (%)", row=2, col=2)
     
-    save_path = "ramp_rate_visualizations/target_based_analysis.html"
+    save_path = "../../visualizations/ramp_rate_visualizations/target_based_analysis.html"
     pyo.plot(fig, filename=save_path, auto_open=False)
     print(f"Target-based analysis saved as: {save_path}")
     
@@ -405,7 +405,7 @@ def create_target_based_analysis(df: pd.DataFrame):
 
 def main():
     """Main function to create interactive ramp rate visualizations."""
-    csv_file = "pinto_season_data_with_ramp_analysis.csv"
+    csv_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
     
     print("Loading ramp rate analysis data...")
     df = load_ramp_data(csv_file)

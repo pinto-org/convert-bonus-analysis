@@ -65,7 +65,7 @@ def create_3d_surface_plots(df: pd.DataFrame):
     # Set viewing angle
     ax.view_init(elev=30, azim=45)
     
-    save_path = "ramp_rate_visualizations/3d_surface_plot.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/3d_surface_plot.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -108,7 +108,7 @@ def create_interactive_3d_surface(df: pd.DataFrame):
         height=700
     )
     
-    save_path = "ramp_rate_visualizations/interactive_3d_surface.html"
+    save_path = "../../visualizations/ramp_rate_visualizations/interactive_3d_surface.html"
     pyo.plot(fig, filename=save_path, auto_open=False)
     print(f"Interactive 3D surface saved as: {save_path}")
 
@@ -182,7 +182,7 @@ def create_contour_plots(df: pd.DataFrame):
     ax2.legend(handles=legend_patches, loc='upper right')
     
     plt.tight_layout()
-    save_path = "ramp_rate_visualizations/contour_plots.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/contour_plots.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -313,7 +313,7 @@ def create_price_regime_analysis(df: pd.DataFrame):
     axes[1,1].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    save_path = "ramp_rate_visualizations/price_regime_analysis.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/price_regime_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -337,7 +337,7 @@ def create_price_regime_analysis(df: pd.DataFrame):
 
 def main():
     """Main function to create advanced ramp rate visualizations."""
-    csv_file = "pinto_season_data_with_ramp_analysis.csv"
+    csv_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
     
     print("Loading ramp rate analysis data...")
     df = load_ramp_data(csv_file)

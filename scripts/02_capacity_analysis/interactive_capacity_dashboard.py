@@ -21,7 +21,7 @@ def load_data(csv_file: str) -> pd.DataFrame:
     print(f"Loaded {len(df)} seasons of data")
     return df
 
-def create_interactive_dashboard(df: pd.DataFrame, output_file: str = "capacity_visualizations/capacity_dashboard.html"):
+def create_interactive_dashboard(df: pd.DataFrame, output_file: str = "../../visualizations/capacity_visualizations/capacity_dashboard.html"):
     """Create comprehensive interactive dashboard."""
     
     # Create subplots
@@ -155,7 +155,7 @@ def create_interactive_dashboard(df: pd.DataFrame, output_file: str = "capacity_
     
     return fig
 
-def create_simple_interactive_timeseries(df: pd.DataFrame, output_file: str = "capacity_visualizations/interactive_timeseries.html"):
+def create_simple_interactive_timeseries(df: pd.DataFrame, output_file: str = "../../visualizations/capacity_visualizations/interactive_timeseries.html"):
     """Create a focused interactive time series plot with toggleable lines."""
     
     fig = go.Figure()
@@ -237,7 +237,7 @@ def create_simple_interactive_timeseries(df: pd.DataFrame, output_file: str = "c
 
 def main():
     """Main function to create interactive visualizations."""
-    csv_file = "pinto_season_data_with_capacity_analysis.csv"
+    csv_file = "../../data/pinto_season_data_with_capacity_analysis.csv"
     
     print("Loading capacity analysis data...")
     df = load_data(csv_file)

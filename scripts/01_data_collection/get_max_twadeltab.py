@@ -54,8 +54,8 @@ def process_season_data(input_file: str, output_file: str):
 
 def main():
     """Main function to process the Pinto season data."""
-    input_file = "pinto_season_data.csv"
-    output_file = "pinto_season_data_with_max_negative.csv"
+    input_file = "../../data/pinto_season_data.csv"
+    output_file = "../../data/pinto_season_data_with_max_negative.csv"
     
     if not os.path.exists(input_file):
         print(f"Error: {input_file} not found. Please run fetch_season_data.py first.")

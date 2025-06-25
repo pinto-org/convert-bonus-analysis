@@ -73,8 +73,8 @@ def add_capacity_columns(input_file: str, output_file: str):
 
 def main():
     """Main function to add capacity analysis to the CSV file."""
-    input_file = "pinto_season_data_with_max_negative.csv"
-    output_file = "pinto_season_data_with_capacity_analysis.csv"
+    input_file = "../../data/pinto_season_data_with_max_negative.csv"
+    output_file = "../../data/pinto_season_data_with_capacity_analysis.csv"
     
     add_capacity_columns(input_file, output_file)
 

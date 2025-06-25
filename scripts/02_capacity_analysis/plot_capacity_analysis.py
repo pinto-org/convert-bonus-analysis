@@ -21,7 +21,7 @@ def load_data(csv_file: str) -> pd.DataFrame:
     print(f"Loaded {len(df)} seasons of data")
     return df
 
-def plot_multiline_timeseries(df: pd.DataFrame, save_path: str = "capacity_visualizations/capacity_timeseries.png"):
+def plot_multiline_timeseries(df: pd.DataFrame, save_path: str = "../../visualizations/capacity_visualizations/capacity_timeseries.png"):
     """Create multi-line time series plot for all S values."""
     plt.figure(figsize=(16, 10))
     
@@ -47,7 +47,7 @@ def plot_multiline_timeseries(df: pd.DataFrame, save_path: str = "capacity_visua
     
     print(f"Multi-line time series saved as: {save_path}")
 
-def plot_capacity_heatmap(df: pd.DataFrame, save_path: str = "capacity_visualizations/capacity_heatmap.png"):
+def plot_capacity_heatmap(df: pd.DataFrame, save_path: str = "../../visualizations/capacity_visualizations/capacity_heatmap.png"):
     """Create heatmap of Season vs S-value with capacity as color."""
     # Create capacity matrix for heatmap
     s_values = list(range(100, 1100, 100))
@@ -80,7 +80,7 @@ def plot_capacity_heatmap(df: pd.DataFrame, save_path: str = "capacity_visualiza
     
     print(f"Heatmap saved as: {save_path}")
 
-def plot_capacity_boxplots(df: pd.DataFrame, save_path: str = "capacity_visualizations/capacity_boxplots.png"):
+def plot_capacity_boxplots(df: pd.DataFrame, save_path: str = "../../visualizations/capacity_visualizations/capacity_boxplots.png"):
     """Create box plots showing capacity distributions for each S value."""
     s_values = list(range(100, 1100, 100))
     capacity_data = []
@@ -111,7 +111,7 @@ def plot_capacity_boxplots(df: pd.DataFrame, save_path: str = "capacity_visualiz
     
     print(f"Box plots saved as: {save_path}")
 
-def plot_key_moments_analysis(df: pd.DataFrame, save_path: str = "capacity_visualizations/key_moments_analysis.png"):
+def plot_key_moments_analysis(df: pd.DataFrame, save_path: str = "../../visualizations/capacity_visualizations/key_moments_analysis.png"):
     """Focus on seasons where maxNegativeTwaDeltaB changed (isNewMaxTwaDeltaB = True)."""
     key_moments = df[df['isNewMaxTwaDeltaB'] == True].copy()
     
@@ -162,7 +162,7 @@ def plot_key_moments_analysis(df: pd.DataFrame, save_path: str = "capacity_visua
 
 def main():
     """Main function to create all capacity visualizations."""
-    csv_file = "pinto_season_data_with_capacity_analysis.csv"
+    csv_file = "../../data/pinto_season_data_with_capacity_analysis.csv"
     
     print("Loading capacity analysis data...")
     df = load_data(csv_file)

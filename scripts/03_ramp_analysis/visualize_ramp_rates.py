@@ -86,7 +86,7 @@ def create_price_delta_heatmaps(df: pd.DataFrame):
     cbar2.set_label('Seasons to Min Capacity', fontsize=12)
     
     plt.tight_layout()
-    save_path = "ramp_rate_visualizations/price_delta_heatmaps.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/price_delta_heatmaps.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -167,7 +167,7 @@ def create_ramp_tradeoff_analysis(df: pd.DataFrame):
     cbar2.set_label('Δd (%)', fontsize=12)
     
     plt.tight_layout()
-    save_path = "ramp_rate_visualizations/ramp_tradeoff_analysis.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/ramp_tradeoff_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -233,7 +233,7 @@ def create_timeseries_analysis(df: pd.DataFrame):
     ax2.set_yscale('log')
     
     plt.tight_layout()
-    save_path = "ramp_rate_visualizations/ramp_timeseries_analysis.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/ramp_timeseries_analysis.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -286,7 +286,7 @@ def create_small_multiples_grid(df: pd.DataFrame):
                  fontsize=16, fontweight='bold', y=0.98)
     plt.tight_layout()
     
-    save_path = "ramp_rate_visualizations/ramp_small_multiples.png"
+    save_path = "../../visualizations/ramp_rate_visualizations/ramp_small_multiples.png"
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
     
@@ -294,7 +294,7 @@ def create_small_multiples_grid(df: pd.DataFrame):
 
 def main():
     """Main function to create all ramp rate visualizations."""
-    csv_file = "pinto_season_data_with_ramp_analysis.csv"
+    csv_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
     
     print("Loading ramp rate analysis data...")
     df = load_ramp_data(csv_file)
@@ -303,7 +303,7 @@ def main():
         return
     
     # Ensure output directory exists
-    os.makedirs("ramp_rate_visualizations", exist_ok=True)
+    os.makedirs("../../visualizations/ramp_rate_visualizations", exist_ok=True)
     
     print("\n1. Creating Price-Δd heatmaps...")
     create_price_delta_heatmaps(df)
