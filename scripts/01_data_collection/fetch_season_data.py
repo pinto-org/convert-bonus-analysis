@@ -190,10 +190,20 @@ def fetch_all_silo_data() -> Dict[int, Dict]:
         
         for snapshot in snapshots:
             season_num = int(snapshot["season"])
-            crop_ratio = snapshot.get("beanToMaxLpGpPerBdvRatio")
+            bean_to_max_lp_gp_per_bdv_ratio = snapshot.get("beanToMaxLpGpPerBdvRatio")
+            
+            # Calculate crop ratio percentage using the formula
+            # Assumes no rain (is_raining = False), so lower_bound = 0.5
+            if bean_to_max_lp_gp_per_bdv_ratio is not None:
+                bean_to_max_lp_gp_per_bdv_ratio = float(bean_to_max_lp_gp_per_bdv_ratio)
+                upper_bound = 2.0
+                lower_bound = 0.5  # No rain
+                crop_ratio_pct = (lower_bound + (upper_bound - lower_bound) * (bean_to_max_lp_gp_per_bdv_ratio / 100e18)) * 100
+            else:
+                crop_ratio_pct = None
             
             all_silo_data[season_num] = {
-                "crop_ratio": crop_ratio
+                "crop_ratio": crop_ratio_pct
             }
         
         if len(snapshots) < batch_size:

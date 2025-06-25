@@ -189,4 +189,9 @@ D_t = {
 - **Seasons to Max**: 0.99 / (Δd × twaPrice)
 - **Seasons to Min**: 0.99 / (0.01 / (Δd × twaPrice))
 
+### **Crop Ratio Calculation**
+- **Formula**: `50% + (150% × beanToMaxLpGpPerBdvRatio / 100e18)`
+- **Range**: 50% to 200% (assumes no rain seasons)
+- **Reset Logic**: maxNegativeTwaDeltaB resets to 0 when crop_ratio < 100% AND twaDeltaB > 0
+
 This analysis provides a data-driven foundation for optimizing Pinto's convert capacity system to maintain protocol stability while ensuring adequate responsiveness to market conditions.

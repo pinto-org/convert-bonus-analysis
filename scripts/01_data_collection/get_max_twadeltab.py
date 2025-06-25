@@ -2,11 +2,15 @@
 """
 Analysis script to process Pinto season data and track maximum negative twaDeltaB values.
 Adds columns for maxNegativeTwaDeltaB and isNewMax to the CSV file.
+
+Key Logic:
+- Tracks maximum negative twaDeltaB since genesis
+- Resets maxNegativeTwaDeltaB to 0 when crop_ratio < 100% AND twaDeltaB > 0
+- Calculates crop_ratio as percentage: 50% + (150% * beanToMaxLpGpPerBdvRatio / 100e18)
 """
 
 import csv
 import os
-from typing import List, Dict, Any
 
 def process_season_data(input_file: str, output_file: str):
     """Process the season data to track maximum negative twaDeltaB values."""
@@ -24,10 +28,15 @@ def process_season_data(input_file: str, output_file: str):
     # Process each row and add new columns
     for row in rows:
         twa_delta_b = float(row['twaDeltaB']) if row['twaDeltaB'] else 0.0
+        crop_ratio = float(row['crop_ratio']) if row['crop_ratio'] else 0.0
         is_new_max = False
         
+        # Reset logic: maxTwaDeltaB resets when crop_ratio < 100% and twaDeltaB > 0
+        if crop_ratio < 100.0 and twa_delta_b > 0:
+            max_negative_twa_delta_b = 0.0  # Reset to 0
+        
         # Apply the logic from requirements:
-        # 1. If twaDeltaB > 0, keep maxNegativeTwaDeltaB unchanged
+        # 1. If twaDeltaB > 0, keep maxNegativeTwaDeltaB unchanged (unless reset above)
         # 2. If twaDeltaB < 0, check if it exceeds current max negative value
         if twa_delta_b < 0:
             # Check if this negative value is more negative than our current max
