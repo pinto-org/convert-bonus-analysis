@@ -20,7 +20,48 @@ def load_ramp_data(csv_file: str) -> pd.DataFrame:
     
     df = pd.read_csv(csv_file)
     print(f"Loaded {len(df)} seasons of ramp rate data")
+    
+    # Check if this is extended data with synthetic prices
+    has_synthetic = 'data_source' in df.columns and 'synthetic' in df['data_source'].values
+    if has_synthetic:
+        synthetic_count = len(df[df['data_source'] == 'synthetic'])
+        historical_count = len(df[df['data_source'] == 'historical'])
+        print(f"  Dataset contains: {historical_count} historical + {synthetic_count} synthetic data points")
+        print(f"  Extended price range: {df['twaPrice'].min():.3f} to {df['twaPrice'].max():.3f}")
+    
     return df
+
+def get_price_range(df: pd.DataFrame, use_quantiles: bool = None) -> tuple:
+    """
+    Get appropriate price range for visualizations.
+    
+    Args:
+        df: DataFrame with price data
+        use_quantiles: If True, use quantile-based range. If None, auto-detect based on data
+    
+    Returns:
+        Tuple of (min_price, max_price)
+    """
+    has_synthetic = 'data_source' in df.columns and 'synthetic' in df['data_source'].values
+    
+    if use_quantiles is None:
+        # Auto-detect: use extended range if synthetic data present, otherwise quantiles
+        use_quantiles = not has_synthetic
+    
+    if use_quantiles:
+        # Traditional quantile-based approach for historical data only
+        min_price = df['twaPrice'].quantile(0.05)
+        max_price = df['twaPrice'].quantile(0.95)
+        print(f"  Using quantile-based price range: {min_price:.3f} to {max_price:.3f}")
+    else:
+        # Extended range approach: synthetic minimum to historical 95th percentile
+        # This gives us the low-price extension without extreme high prices
+        historical_data = df[df['data_source'] == 'historical']
+        min_price = df['twaPrice'].min()  # Include synthetic low prices
+        max_price = historical_data['twaPrice'].quantile(0.95)  # Cap at historical 95th percentile
+        print(f"  Using extended price range: {min_price:.3f} to {max_price:.3f} (synthetic + historical 95th %ile)")
+    
+    return min_price, max_price
 
 def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../../visualizations/ramp_rate_visualizations/ramp_interactive_dashboard.html"):
     """Create comprehensive interactive dashboard for ramp rate analysis."""
@@ -46,7 +87,8 @@ def create_interactive_ramp_dashboard(df: pd.DataFrame, output_file: str = "../.
     
     # 1. Price-Δd Heatmap (Top Left)
     # Create aggregated data for heatmap
-    price_bins = np.linspace(df['twaPrice'].quantile(0.05), df['twaPrice'].quantile(0.95), 15)
+    min_price, max_price = get_price_range(df)
+    price_bins = np.linspace(min_price, max_price, 15)
     price_centers = (price_bins[:-1] + price_bins[1:]) / 2
     
     # Initialize heatmap matrix
@@ -338,7 +380,8 @@ def create_target_based_analysis(df: pd.DataFrame):
     # 3. Price Impact Analysis (Bottom Left)
     # Show how price changes affect ramp times for fixed Δd
     fixed_delta = 2.0  # Example fixed delta
-    price_range = np.linspace(df['twaPrice'].quantile(0.1), df['twaPrice'].quantile(0.9), 20)
+    min_price, max_price = get_price_range(df)
+    price_range = np.linspace(min_price, max_price, 20)
     
     ramp_times_by_price = []
     for price in price_range:
@@ -412,13 +455,28 @@ def create_target_based_analysis(df: pd.DataFrame):
 
 def main():
     """Main function to create interactive ramp rate visualizations."""
-    csv_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
+    
+    # Try to load extended dataset first, fall back to regular dataset
+    extended_file = "../../data/pinto_season_data_with_extended_ramp_analysis.csv"
+    regular_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
     
     print("Loading ramp rate analysis data...")
-    df = load_ramp_data(csv_file)
+    df = load_ramp_data(extended_file)
     
     if df is None:
-        return
+        print(f"Extended dataset not found, trying regular dataset...")
+        df = load_ramp_data(regular_file)
+        
+        if df is None:
+            print("No ramp rate data found. Please run ramp_rate_analysis.py first.")
+            return
+    
+    # Check data source and report
+    has_synthetic = 'data_source' in df.columns and 'synthetic' in df['data_source'].values
+    if has_synthetic:
+        print("Using extended dataset with synthetic price data for complete coverage.")
+    else:
+        print("Using historical dataset only.")
     
     # Ensure output directory exists
     os.makedirs("ramp_rate_visualizations", exist_ok=True)
@@ -434,6 +492,7 @@ def main():
     
     print("\nInteractive ramp rate visualizations completed!")
     print("Open the HTML files in your browser to explore the data interactively.")
+    print(f"Price range covered: {df['twaPrice'].min():.3f} to {df['twaPrice'].max():.3f}")
 
 if __name__ == "__main__":
     main()

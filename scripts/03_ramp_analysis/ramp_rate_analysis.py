@@ -6,6 +6,8 @@ Calculates effective D_t and seasons to max/min capacity for different delta_d p
 
 import pandas as pd
 import os
+import argparse
+from synthetic_price_extension import create_extended_dataset
 
 def calculate_ramp_rates(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -148,8 +150,19 @@ def save_ramp_analysis(df: pd.DataFrame, output_file: str):
 
 def main():
     """Main function for ramp rate analysis."""
+    parser = argparse.ArgumentParser(description='Ramp rate analysis with optional synthetic price extension')
+    parser.add_argument('--extend-prices', action='store_true', 
+                       help='Include synthetic price data from 0.25 to minimum historical price')
+    parser.add_argument('--min-price', type=float, default=0.25,
+                       help='Minimum price for synthetic data extension (default: 0.25)')
+    parser.add_argument('--price-step', type=float, default=0.01,
+                       help='Price step size for synthetic data (default: 0.01)')
+    
+    args = parser.parse_args()
+    
     input_file = "../../data/pinto_season_data_with_capacity_analysis.csv"
     output_file = "../../data/pinto_season_data_with_ramp_analysis.csv"
+    extended_output_file = "../../data/pinto_season_data_with_extended_ramp_analysis.csv"
     
     if not os.path.exists(input_file):
         print(f"Error: {input_file} not found. Please run add_capacity_analysis.py first.")
@@ -165,10 +178,38 @@ def main():
     print("\nAnalyzing historical patterns...")
     analyze_historical_ramp_patterns(df)
     
-    print(f"\nSaving results...")
+    print(f"\nSaving historical results...")
     save_ramp_analysis(result_df, output_file)
     
+    # Create extended dataset if requested
+    if args.extend_prices:
+        print(f"\nCreating extended dataset with synthetic price data...")
+        print(f"  Extending prices from {args.min_price} to {result_df['twaPrice'].min():.3f}")
+        print(f"  Using price step: {args.price_step}")
+        
+        extended_df, metadata = create_extended_dataset(
+            result_df,
+            include_synthetic=True,
+            min_synthetic_price=args.min_price,
+            price_step=args.price_step
+        )
+        
+        print(f"\nSaving extended results...")
+        extended_df.to_csv(extended_output_file, index=False)
+        print(f"Extended dataset saved to: {extended_output_file}")
+        print(f"Extended dataset contains {len(extended_df)} total rows")
+        print(f"  - {metadata['historical_count']} historical seasons")
+        print(f"  - {metadata['synthetic_count']} synthetic price points")
+        
+        # Update analysis summary
+        print(f"\nExtended Dataset Summary:")
+        print(f"  Price range: {extended_df['twaPrice'].min():.3f} to {extended_df['twaPrice'].max():.3f}")
+        print(f"  Historical data: {metadata['historical_price_range'][0]:.3f} to {metadata['historical_price_range'][1]:.3f}")
+        print(f"  Synthetic data: {metadata['synthetic_price_range'][0]:.3f} to {metadata['synthetic_price_range'][1]:.3f}")
+    
     print(f"\nRamp rate analysis completed!")
+    if args.extend_prices:
+        print(f"Use the extended dataset ({extended_output_file}) for complete price range visualizations.")
 
 if __name__ == "__main__":
     main()

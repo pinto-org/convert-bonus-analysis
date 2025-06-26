@@ -8,7 +8,7 @@ import os
 import subprocess
 import sys
 
-def run_script(script_path, description):
+def run_script(script_path, description, args=None):
     """Run a Python script and handle errors."""
     print(f"\n{'='*60}")
     print(f"🚀 {description}")
@@ -19,8 +19,13 @@ def run_script(script_path, description):
         script_dir = os.path.dirname(script_path)
         script_name = os.path.basename(script_path)
         
+        # Build command with optional arguments
+        cmd = [sys.executable, script_name]
+        if args:
+            cmd.extend(args)
+        
         result = subprocess.run(
-            [sys.executable, script_name],
+            cmd,
             cwd=script_dir,
             capture_output=True,
             text=True,
@@ -67,8 +72,8 @@ def main():
         ("scripts/02_capacity_analysis/plot_capacity_analysis.py", "Step 5: Generate Capacity Visualizations"),
         ("scripts/02_capacity_analysis/interactive_capacity_dashboard.py", "Step 6: Create Interactive Capacity Dashboard"),
         
-        # Step 3: Ramp Rate Analysis
-        ("scripts/03_ramp_analysis/ramp_rate_analysis.py", "Step 7: Ramp Rate Analysis (Δd Parameters)"),
+        # Step 3: Ramp Rate Analysis (with synthetic price extension)
+        ("scripts/03_ramp_analysis/ramp_rate_analysis.py", "Step 7: Extended Ramp Rate Analysis (Δd + Synthetic Prices)", ["--extend-prices", "--min-price", "0.25", "--price-step", "0.01"]),
         ("scripts/03_ramp_analysis/visualize_ramp_rates.py", "Step 8: Generate Ramp Rate Visualizations"),
         ("scripts/03_ramp_analysis/interactive_ramp_dashboard.py", "Step 9: Create Interactive Ramp Dashboard"),
         ("scripts/03_ramp_analysis/advanced_ramp_visualizations.py", "Step 10: Advanced Ramp Visualizations"),
@@ -79,8 +84,14 @@ def main():
     completed_steps = 0
     
     # Run each step
-    for script_path, description in pipeline:
-        if run_script(script_path, description):
+    for step in pipeline:
+        if len(step) == 3:
+            script_path, description, args = step
+        else:
+            script_path, description = step
+            args = None
+            
+        if run_script(script_path, description, args):
             completed_steps += 1
             print(f"📊 Progress: {completed_steps}/{total_steps} steps completed")
         else:
@@ -97,9 +108,9 @@ def main():
     print(f"📊 Visualizations created in: ./visualizations/")
     print(f"")
     print(f"📈 Generated Files:")
-    print(f"   • 4 CSV files with complete analysis")
+    print(f"   • 5 CSV files with complete analysis (including extended ramp data)")
     print(f"   • 6 capacity visualization files")
-    print(f"   • 11 ramp rate visualization files")
+    print(f"   • 11 ramp rate visualization files with full price coverage (0.25-29.43)")
     print(f"")
     print(f"🔍 Next Steps:")
     print(f"   • Open HTML files in browser for interactive exploration")
